@@ -48,7 +48,30 @@ export function connectWs(wsUrl: string) {
 			console.log(
 					entry.args.map((arg: any) => arg.value).join("|")
 			);
-			oc.appendLine('>> ' + entry.args.map((arg: any) => arg.value).join(" "));
+			console.log(entry);
+			//oc.appendLine('>> ' + entry.args.map((arg: any) => arg.value));
+			entry.args.map((arg: any) => {
+				switch(arg.type) {
+					case 'string': {
+						oc.appendLine('>> ' + arg.value);
+						break;
+					}
+					case 'number': {
+						oc.appendLine('>> ' + arg.value);
+						break;
+					}
+					case 'object': {
+						if (arg.preview?.properties) {
+							let arr: any[] = [];
+							arg.preview.properties.map((prop: any) => {
+								arr.push(prop.value);
+							});
+							oc.appendLine('>> ' + JSON.stringify(arr));
+						}
+					}
+
+				}
+			});
 		});
 		Promise.all([client.Runtime.enable()]);
 		console.log("connected!");
