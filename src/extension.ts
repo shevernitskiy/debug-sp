@@ -1,3 +1,4 @@
+import { generateKeyPair } from 'crypto';
 import * as vscode from 'vscode';
 var axios = require('axios').default;
 var cdp = require("chrome-remote-interface");
@@ -16,6 +17,10 @@ let content = defaultLine;
 const keys = {
 	enter: "\r",
 	backspace: "\x7f",
+	left: "\x1b[D",
+	right: "\x1b[C",
+	up: "\x1b[A",
+	down: "\x1b[B",
 };
 const actions = {
 	cursorBack: "\x1b[D",
@@ -53,6 +58,12 @@ export function activate(context: vscode.ExtensionContext) {
 					writeEmitter.fire(`\r${content}\r\n`);
 					// trim off leading default prompt
 					const command = content.slice(defaultLine.length);
+					if (command === 'clear') {
+						writeEmitter.fire(actions.clear);
+						content = defaultLine;
+						writeEmitter.fire(`\r${content}`);
+						return;
+					}
 					if (!status) {
 						writeEmitter.fire(`${symbol.x} CDP not connected\r\n`);
 					} else {
@@ -66,9 +77,9 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 					content = defaultLine;
 					writeEmitter.fire(`\r${content}`);
+					return;
 				}
 				case keys.backspace: {
-					console.log("backspace");
 					if (content.length <= defaultLine.length) {
 						return;
 					}
@@ -78,6 +89,12 @@ export function activate(context: vscode.ExtensionContext) {
 					writeEmitter.fire(actions.deleteChar);
 					return;
 				}
+				case keys.up:
+				case keys.down:
+				case keys.left:
+				case keys.right: {
+					return;
+				};
 				default: {
 					// typing a new character
 					content += char;
