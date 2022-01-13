@@ -27,4 +27,13 @@ on("consoleMessage", (e) => {
 });
 ```
 
+To handle Debug SP input you should catch `browserMessage`
+
+```ts
+on("browserMessage", (event) => {
+    // do something with event.arguments
+    // maybe perform game command
+});
+```
+
 CDP url hardcoded to http://localhost:9000 for now...
